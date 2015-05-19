@@ -2,7 +2,7 @@
 
 purescript-spec-reporter-xunit is a reporter for
 [purescript-spec](https://github.com/owickstrom/purescript-spec) that outputs
-Xunit reporters consumable by Jenkins (perhaps others as well?).
+Xunit reports consumable by Jenkins (perhaps others as well?).
 
 ## Usage
 
