@@ -27,7 +27,7 @@ See [API](API.md).
 ## Contribute
 
 If you have any issues or possible improvements please file them as
-[GitHub Issues](https://github.com/owickstrom/purescript-spec-quickcheck/issues).
+[GitHub Issues](https://github.com/owickstrom/purescript-spec-reporter-xunit/issues).
 Pull requests requests are encouraged.
 
 ## License
