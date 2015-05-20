@@ -14,7 +14,6 @@ bower install purescript-spec-reporter-xunit
 module Main where
 
 import Test.Spec.Node
-import Test.Spec.Reporter.Console
 import Test.Spec.Reporter.Xunit
 
 main = runNode [xunitReporter "path/to/output.xml"] do
