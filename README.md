@@ -11,7 +11,7 @@ bower install purescript-spec-reporter-xunit
 ```
 
 ```purescript
-main = runNode [xunitReporter] specs
+main = runNode [xunitReporter "path/to/output.xml"] specs
 ```
 
 ## API
