@@ -1,8 +1,11 @@
 module Data.XML.PrettyPrintSpec where
 
+import Prelude
+
 import Test.Spec
 import Test.Spec.Node
 import Test.Spec.Assertions
+
 import Test.Spec.Fixtures
 import qualified Data.XML as XML
 import qualified Data.XML.PrettyPrint as PP

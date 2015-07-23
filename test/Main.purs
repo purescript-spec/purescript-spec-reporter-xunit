@@ -1,7 +1,10 @@
-module Main where
+module Test.Main where
+
+import Prelude
 
 import Test.Spec.Node
 import Test.Spec.Reporter.Console
+
 import Test.Spec.Reporter.Xunit
 import Test.Spec.Reporter.XunitSpec
 import Data.XML.PrettyPrintSpec

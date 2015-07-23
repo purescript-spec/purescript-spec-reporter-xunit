@@ -1,20 +1,26 @@
-module Data.XML.PrettyPrint where
+module Data.XML.PrettyPrint (
+  Indent(),
+  print
+  ) where
 
-import Data.Array (map, replicate)
-import Data.Char (fromCharCode)
-import Data.String (fromCharArray, split)
-import Data.String.Regex (regex, noFlags, replace')
-import Data.Tuple
-import Data.Foldable
-import Data.XML
+import Prelude
+
 import Control.Monad.Trans
 import Control.Monad.State.Class
 import Control.Monad.State.Trans
 import Control.Monad.Writer
 import Control.Monad.Writer.Class
+import Data.Array                 (replicate)
+import Data.Char                  (fromCharCode)
+import Data.String                (fromCharArray, split)
+import Data.String.Regex          (regex, noFlags, replace')
+import Data.Tuple
+import Data.Foldable              (foldl, sequence_)
 
-type Indent = Number
-type CurrentIndent = Number
+import Data.XML
+
+type Indent = Int
+type CurrentIndent = Int
 
 -- | The number of spaces in an indent and the current number of indents made.
 -- | `PrinterState 2 6` represents 12 spaces.
@@ -42,7 +48,7 @@ appendLine s = do
 enclosed :: String -> String -> String -> String
 enclosed before after contents = before ++ contents ++ after
 
-openTag :: String -> [Attr] -> String
+openTag :: String -> Array Attr -> String
 openTag contents attrs = enclosed "<" ">" (contents ++ showAttrs attrs)
 
 closeTag :: String -> String
@@ -77,9 +83,9 @@ printNode (Element tagName attrs nodes) = do
   dedent
   appendLine $ closeTag tagName
 
-showAttrs :: [Attr] -> String
-showAttrs [] = ""
-showAttrs (Attr key value : rest) = " " ++ key ++ "=\"" ++ (escape value) ++ "\"" ++ showAttrs rest
+showAttrs :: Array Attr -> String
+showAttrs as = foldl iter "" as
+  where iter acc (Attr key value) = acc ++ " " ++ key ++ "=\"" ++ (escape value) ++ "\""
 
 printDocument :: Document -> Printer Unit
 printDocument (Document version encoding node) = do

@@ -1,5 +1,7 @@
 module Test.Spec.Fixtures where
 
+import Prelude
+
 import Test.Spec
 import Test.Spec.Assertions
 

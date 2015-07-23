@@ -13,6 +13,8 @@ bower install purescript-spec-reporter-xunit
 ```purescript
 module Main where
 
+import Prelude
+
 import Test.Spec.Node
 import Test.Spec.Reporter.Xunit
 
@@ -20,9 +22,15 @@ main = runNode [xunitReporter "path/to/output.xml"] do
   ...
 ```
 
-## API
+## API Documentation
 
-See [API](API.md).
+See [the docs directory](docs/).
+
+### Generating Docs
+
+```bash
+pulp docs
+```
 
 ## Contribute
 

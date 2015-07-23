@@ -1,12 +1,14 @@
 module Test.Spec.Reporter.XunitSpec where
 
-import Data.Either
+import Prelude
+
 import Control.Monad.Aff
 import Control.Monad.Eff
 import Control.Monad.Eff.Class
 import Control.Monad.Eff.Exception
 import Control.Monad.Trans
 import Control.Monad.Error.Class
+import Data.Either
 import Node.Encoding
 import Node.Path
 import Node.FS (FS(..))
@@ -15,6 +17,7 @@ import Test.Spec
 import Test.Spec.Node
 import Test.Spec.Assertions hiding (shouldContain)
 import Test.Spec.Assertions.String
+
 import Test.Spec.Fixtures
 import Test.Spec.Reporter.Xunit
 
