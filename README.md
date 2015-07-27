@@ -15,10 +15,10 @@ module Main where
 
 import Prelude
 
-import Test.Spec.Node
+import Test.Spec.Runner
 import Test.Spec.Reporter.Xunit
 
-main = runNode [xunitReporter "path/to/output.xml"] do
+main = run [xunitReporter "path/to/output.xml"] do
   ...
 ```
 
