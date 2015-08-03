@@ -14,7 +14,6 @@ import Node.Path
 import Node.FS (FS(..))
 import Node.FS.Sync (readTextFile, unlink)
 import Test.Spec
-import Test.Spec.Node
 import Test.Spec.Assertions hiding (shouldContain)
 import Test.Spec.Assertions.String
 

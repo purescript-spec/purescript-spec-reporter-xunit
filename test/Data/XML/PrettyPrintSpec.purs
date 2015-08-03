@@ -3,7 +3,6 @@ module Data.XML.PrettyPrintSpec where
 import Prelude
 
 import Test.Spec
-import Test.Spec.Node
 import Test.Spec.Assertions
 
 import Test.Spec.Fixtures
