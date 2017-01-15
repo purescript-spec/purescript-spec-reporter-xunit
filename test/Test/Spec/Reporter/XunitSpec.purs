@@ -1,46 +1,41 @@
 module Test.Spec.Reporter.XunitSpec where
 
 import Prelude
-
-import Control.Monad.Aff
-import Control.Monad.Eff
-import Control.Monad.Eff.Class
-import Control.Monad.Eff.Exception
-import Control.Monad.Trans
-import Control.Monad.Error.Class
-import Data.Either
-import Node.Encoding
-import Node.Path
-import Node.FS (FS(..))
+import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Node.Encoding (Encoding(UTF8))
+import Node.FS (FS)
 import Node.FS.Sync (readTextFile, unlink)
-import Test.Spec
-import Test.Spec.Assertions hiding (shouldContain)
-import Test.Spec.Assertions.String
+import Node.Process (PROCESS)
+import Test.Spec (itOnly, SpecEffects, Spec, it, describe)
+import Test.Spec.Assertions (fail)
+import Test.Spec.Assertions.String (shouldContain)
+import Test.Spec.Reporter.Xunit (xunitReporter)
+import Test.Spec.Runner (run)
 
-import Test.Spec.Fixtures
-import Test.Spec.Reporter.Xunit
-
-successResult = [Describe "a" [It "works" Success]]
-failureResult = [Describe "a" [It "fails" $ Failure (error "OMG")]]
-
--- This is only needed for type inference.
-catchFs :: forall e v. Eff (fs :: FS | e) v -> Aff (fs :: FS | e) v
-catchFs e = liftEff $ e
-
+xunitSpec :: Spec (SpecEffects (fs :: FS, err :: EXCEPTION, process :: PROCESS)) Unit
 xunitSpec = do
   describe "Test" $
     describe "Spec" $
       describe "Reporter" $
         describe "Xunit" do
-          let path = "output/test.tmp.xml"
-              doctype = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+          let doctype = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
           it "reports success" do
-            catchFs $ xunitReporter path successResult
-            contents <- catchFs $ readTextFile UTF8 path
-            contents`shouldEqual` (doctype ++ "<testsuite>\n  <testsuite name=\"a\">\n    <testcase name=\"works\"></testcase>\n  </testsuite>\n</testsuite>\n")
+            contents <- runXunit successSpec
+            contents`shouldContain` "<testcase name=\"works\"></testcase>"
           it "reports failure" do
-            catchFs $ xunitReporter path failureResult
-            contents <- catchFs $ readTextFile UTF8 path
+            contents <- runXunit failureSpec
             contents `shouldContain` "<testcase name=\"fails\">"
             contents `shouldContain` "Error"
 
+  where
+    successSpec = describe "a" (itOnly "works" (pure unit))
+    failureSpec = describe "a" (itOnly "fails" (fail "OMG"))
+
+    runXunit spec = do
+      liftEff $ do
+        let path = "output/test.tmp.xml"
+        run [xunitReporter { indentation: 2 , outputPath: path }] spec
+        contents <- readTextFile UTF8 path
+        unlink path
+        pure contents

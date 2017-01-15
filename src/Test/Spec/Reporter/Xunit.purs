@@ -1,56 +1,63 @@
-module Test.Spec.Reporter.Xunit (
-  xunitReporter
-  )
-  where
+module Test.Spec.Reporter.Xunit
+       ( xunitReporter
+       , defaultOptions
+       ) where
 
 import Prelude
-
-import Control.Monad.Eff
-import Control.Monad.Eff.Exception (EXCEPTION(), message)
-import Control.Monad
-import Data.Maybe
-import Data.Foldable
-import Node.Encoding
-import Node.Path
-import Node.FS (FS(..))
+import Data.XML as XML
+import Test.Spec as S
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Eff.Exception (EXCEPTION, message)
+import Data.XML.PrettyPrint (print)
+import Node.Encoding (Encoding(UTF8))
+import Node.FS (FS)
 import Node.FS.Sync (writeTextFile, exists, unlink)
+import Node.Path (FilePath)
+import Test.Spec.Runner (Reporter)
+import Test.Spec.Reporter.Base (defaultReporter)
 
-import qualified Test.Spec as S
-import Test.Spec.Console
-import Test.Spec.Summary
-import Test.Spec.Reporter
-
-import Data.XML hiding (Encoding())
-import Data.XML.PrettyPrint
-
-encodeResult :: S.Result -> Array Node
+encodeResult :: S.Result -> Array XML.Node
 encodeResult S.Success = []
 encodeResult (S.Failure err) =
-  [Element
+  [XML.Element
     "error"
-    [Attr "message" (message err)]
-    [Text (show err)]]
+    [XML.Attr "message" (message err)]
+    [XML.Text (show err)]]
 
-encodeGroup :: S.Group -> Node
-encodeGroup (S.Describe name groups) =
-  Element "testsuite" [Attr "name" name] $ map encodeGroup groups
-encodeGroup (S.It name result) =
-  Element "testcase" [Attr "name" name] (encodeResult result)
+encodeGroup :: S.Group S.Result -> XML.Node
+encodeGroup (S.Describe _ name groups) =
+  XML.Element "testsuite" [XML.Attr "name" name] $ map encodeGroup groups
+encodeGroup (S.It _ name result) =
+  XML.Element "testcase" [XML.Attr "name" name] (encodeResult result)
+encodeGroup (S.Pending name) =
+  XML.Element "testcase" [XML.Attr "name" name] [XML.Element "skipped" [] []]
 
-encodeSuite :: Array S.Group -> Document
-encodeSuite groups = Document "1.0" "UTF-8" $ Element "testsuite" [] $ map encodeGroup groups
+encodeSuite :: Array (S.Group S.Result) -> XML.Document
+encodeSuite groups = XML.Document "1.0" "UTF-8" $ XML.Element "testsuite" [] $ map encodeGroup groups
 
 removeIfExists :: forall e. FilePath -> Eff (fs :: FS, err :: EXCEPTION | e) Unit
 removeIfExists path = do
   e <- exists path
   when e $ unlink path
 
--- | Outputs an XML file at the given path that can be consumed by Xunit
--- | readers, e.g. the Jenkins plugin.
-xunitReporter :: forall e. FilePath -> Reporter (fs :: FS, err :: EXCEPTION | e)
-xunitReporter path groups = do
-  let xml = encodeSuite groups
-      s = print 2 xml
-  removeIfExists path
-  writeTextFile UTF8 path s
+type XunitReporterOptions = { outputPath :: FilePath
+                            , indentation :: Int
+                            }
 
+defaultOptions :: XunitReporterOptions
+defaultOptions = { indentation: 2, outputPath: "output/test.xml" }
+
+
+xunitReporter :: ∀ e.
+                 XunitReporterOptions
+              -> Reporter (fs :: FS, err :: EXCEPTION, console :: CONSOLE | e)
+xunitReporter options =
+  defaultReporter options update summarize
+  where
+    update s _ = pure s
+
+    summarize _  groups = do
+      let xml = encodeSuite groups
+      removeIfExists options.outputPath
+      writeTextFile UTF8 options.outputPath (print options.indentation xml)

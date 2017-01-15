@@ -2,8 +2,8 @@ module Test.Spec.Fixtures where
 
 import Prelude
 
-import Test.Spec
-import Test.Spec.Assertions
+import Test.Spec (describe, it, pending)
+import Test.Spec.Assertions (shouldEqual)
 
 successTest =
   describe "a" do
@@ -23,4 +23,3 @@ sharedDescribeTest =
 failureTest = it "fails" $ 1 `shouldEqual` 2
 
 pendingTest = pending "is not written yet"
-
