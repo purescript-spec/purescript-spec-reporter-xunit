@@ -35,7 +35,7 @@ xunitSpec = do
     runXunit spec = do
       liftEff $ do
         let path = "output/test.tmp.xml"
-        run [xunitReporter { indentation: 2 , outputPath: path }] spec
+        run [xunitReporter { indentation: 2, outputPath: path }] spec
         contents <- readTextFile UTF8 path
         unlink path
         pure contents
