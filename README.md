@@ -18,7 +18,7 @@ import Prelude
 import Test.Spec.Runner
 import Test.Spec.Reporter.Xunit
 
-main = run [ xunitReporter { indentation: 2, outputPath: path } ] do
+main = run [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
   ...
 ```
 
