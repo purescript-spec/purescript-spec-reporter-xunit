@@ -13,5 +13,6 @@
     "purescript-spec": "^0.12.0",
     "purescript-node-fs": "^3.0.0",
     "purescript-transformers": "^2.1.0"
-  }
+  },
+  "license": "MIT"
 }
