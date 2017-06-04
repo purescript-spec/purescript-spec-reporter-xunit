@@ -15,6 +15,7 @@ import Node.FS (FS)
 import Node.FS.Sync (writeTextFile, exists, unlink)
 import Node.Path (FilePath)
 import Test.Spec.Runner (Reporter)
+import Test.Spec.Runner.Event as Event
 import Test.Spec.Reporter.Base (defaultReporter)
 
 encodeResult :: S.Result -> Array XML.Node
@@ -36,7 +37,7 @@ encodeGroup (S.Pending name) =
 encodeSuite :: Array (S.Group S.Result) -> XML.Document
 encodeSuite groups = XML.Document "1.0" "UTF-8" $ XML.Element "testsuite" [] $ map encodeGroup groups
 
-removeIfExists :: forall e. FilePath -> Eff (fs :: FS, err :: EXCEPTION | e) Unit
+removeIfExists :: forall e. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | e) Unit
 removeIfExists path = do
   e <- exists path
   when e $ unlink path
@@ -51,13 +52,15 @@ defaultOptions = { indentation: 2, outputPath: "output/test.xml" }
 
 xunitReporter :: ∀ e.
                  XunitReporterOptions
-              -> Reporter (fs :: FS, err :: EXCEPTION, console :: CONSOLE | e)
+              -> Reporter (fs :: FS, exception :: EXCEPTION, console :: CONSOLE | e)
 xunitReporter options =
-  defaultReporter options update summarize
+  defaultReporter options update
   where
-    update s _ = pure s
+    update s = case _ of
+      Event.End results -> s <$ summarize results
+      _ -> pure s
 
-    summarize _  groups = do
+    summarize groups = do
       let xml = encodeSuite groups
       removeIfExists options.outputPath
       writeTextFile UTF8 options.outputPath (print options.indentation xml)

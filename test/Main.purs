@@ -9,7 +9,7 @@ import Test.Spec.Reporter.Xunit (xunitReporter, defaultOptions)
 import Test.Spec.Reporter.XunitSpec (xunitSpec)
 import Test.Spec.Runner (RunnerEffects, run)
 
-main :: Eff (RunnerEffects (fs :: FS, err :: EXCEPTION)) Unit
+main :: Eff (RunnerEffects (fs :: FS, exception :: EXCEPTION)) Unit
 main = run reporters do
   xunitSpec
   prettyPrintSpec

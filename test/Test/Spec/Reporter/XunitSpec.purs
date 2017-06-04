@@ -13,7 +13,7 @@ import Test.Spec.Assertions.String (shouldContain)
 import Test.Spec.Reporter.Xunit (xunitReporter)
 import Test.Spec.Runner (run)
 
-xunitSpec :: Spec (SpecEffects (fs :: FS, err :: EXCEPTION, process :: PROCESS)) Unit
+xunitSpec :: Spec (SpecEffects (fs :: FS, exception :: EXCEPTION, process :: PROCESS)) Unit
 xunitSpec = do
   describe "Test" $
     describe "Spec" $
