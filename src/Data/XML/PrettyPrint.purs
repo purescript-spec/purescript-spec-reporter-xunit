@@ -60,7 +60,7 @@ escape s =
         replacer "\"" _ = "&quot;"
         replacer "\t" _ = ""
         replacer "\r" _ = ""
-        replacer s _ = s
+        replacer s' _ = s'
         flags = RegexFlags {
           unicode: false,
           sticky: false,
