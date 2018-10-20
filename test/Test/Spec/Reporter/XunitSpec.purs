@@ -1,19 +1,17 @@
 module Test.Spec.Reporter.XunitSpec where
 
 import Prelude
-import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Exception (EXCEPTION)
+
+import Effect.Class (liftEffect)
 import Node.Encoding (Encoding(UTF8))
-import Node.FS (FS)
 import Node.FS.Sync (readTextFile, unlink)
-import Node.Process (PROCESS)
-import Test.Spec (itOnly, SpecEffects, Spec, it, describe)
+import Test.Spec (itOnly, Spec, it, describe)
 import Test.Spec.Assertions (fail)
 import Test.Spec.Assertions.String (shouldContain)
 import Test.Spec.Reporter.Xunit (xunitReporter)
 import Test.Spec.Runner (run)
 
-xunitSpec :: Spec (SpecEffects (fs :: FS, exception :: EXCEPTION, process :: PROCESS)) Unit
+xunitSpec :: Spec Unit
 xunitSpec = do
   describe "Test" $
     describe "Spec" $
@@ -22,7 +20,7 @@ xunitSpec = do
           let doctype = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
           it "reports success" do
             contents <- runXunit successSpec
-            contents`shouldContain` "<testcase name=\"works\"></testcase>"
+            contents `shouldContain` "<testcase name=\"works\"></testcase>"
           it "reports failure" do
             contents <- runXunit failureSpec
             contents `shouldContain` "<testcase name=\"fails\">"
@@ -33,7 +31,7 @@ xunitSpec = do
     failureSpec = describe "a" (itOnly "fails" (fail "OMG"))
 
     runXunit spec = do
-      liftEff $ do
+      liftEffect $ do
         let path = "output/test.tmp.xml"
         run [xunitReporter { indentation: 2, outputPath: path }] spec
         contents <- readTextFile UTF8 path

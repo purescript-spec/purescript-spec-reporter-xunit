@@ -8,10 +8,10 @@ import Data.XML as XML
 import Control.Monad.State (runStateT, get, lift, modify, StateT)
 import Control.Monad.Writer (execWriter, tell, Writer)
 import Data.Array (replicate)
-import Data.Char (fromCharCode)
 import Data.Either (Either(Right, Left))
 import Data.Foldable (foldl, sequence_)
-import Data.String (Pattern(Pattern), fromCharArray, split)
+import Data.String (Pattern(Pattern), split)
+import Data.String.CodeUnits (fromCharArray)
 import Data.String.Regex (regex, replace')
 import Data.String.Regex.Flags (RegexFlags(RegexFlags))
 
@@ -25,15 +25,15 @@ data PrinterState = PrinterState Indent CurrentIndent
 type Printer v = StateT PrinterState (Writer String) v
 
 indent :: Printer Unit
-indent = modify $ \(PrinterState i ci) -> PrinterState i (ci + 1)
+indent = void $ modify $ \(PrinterState i ci) -> PrinterState i (ci + 1)
 
 dedent :: Printer Unit
-dedent = modify $ \(PrinterState i ci) -> PrinterState i (ci - 1)
+dedent = void $ modify $ \(PrinterState i ci) -> PrinterState i (ci - 1)
 
 indentSpaces :: Printer String
 indentSpaces = do
   (PrinterState indentWidth currentIndent) <- get
-  pure $ fromCharArray $ replicate (indentWidth * currentIndent) (fromCharCode 32)
+  pure $ fromCharArray $ replicate (indentWidth * currentIndent) ' '
 
 appendLine :: String -> Printer Unit
 appendLine "" = lift $ tell "\n"
