@@ -6,7 +6,7 @@ import Data.XML.PrettyPrint as PP
 import Test.Spec (Spec, it, describe)
 import Test.Spec.Assertions (shouldEqual)
 
-prettyPrintSpec :: forall e. Spec e Unit
+prettyPrintSpec :: Spec Unit
 prettyPrintSpec =
   describe "Data" $
     describe "XML" do

@@ -6,12 +6,10 @@ module Test.Spec.Reporter.Xunit
 import Prelude
 import Data.XML as XML
 import Test.Spec as S
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
-import Control.Monad.Eff.Exception (EXCEPTION, message)
+import Effect (Effect)
+import Effect.Exception (message)
 import Data.XML.PrettyPrint (print)
 import Node.Encoding (Encoding(UTF8))
-import Node.FS (FS)
 import Node.FS.Sync (writeTextFile, exists, unlink)
 import Node.Path (FilePath)
 import Test.Spec.Runner (Reporter)
@@ -37,7 +35,7 @@ encodeGroup (S.Pending name) =
 encodeSuite :: Array (S.Group S.Result) -> XML.Document
 encodeSuite groups = XML.Document "1.0" "UTF-8" $ XML.Element "testsuite" [] $ map encodeGroup groups
 
-removeIfExists :: forall e. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | e) Unit
+removeIfExists :: FilePath -> Effect Unit
 removeIfExists path = do
   e <- exists path
   when e $ unlink path
@@ -50,9 +48,7 @@ defaultOptions :: XunitReporterOptions
 defaultOptions = { indentation: 2, outputPath: "output/test.xml" }
 
 
-xunitReporter :: ∀ e.
-                 XunitReporterOptions
-              -> Reporter (fs :: FS, exception :: EXCEPTION, console :: CONSOLE | e)
+xunitReporter :: XunitReporterOptions -> Reporter
 xunitReporter options =
   defaultReporter options update
   where
