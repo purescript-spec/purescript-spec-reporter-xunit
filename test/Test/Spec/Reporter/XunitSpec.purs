@@ -9,7 +9,7 @@ import Test.Spec (itOnly, Spec, it, describe)
 import Test.Spec.Assertions (fail)
 import Test.Spec.Assertions.String (shouldContain)
 import Test.Spec.Reporter.Xunit (xunitReporter)
-import Test.Spec.Runner (run)
+import Test.Spec.Runner (defaultConfig, run')
 
 xunitSpec :: Spec Unit
 xunitSpec = do
@@ -32,8 +32,9 @@ xunitSpec = do
 
     runXunit spec = do
       liftEffect $ do
-        let path = "output/test.tmp.xml"
-        run [xunitReporter { indentation: 2, outputPath: path }] spec
+        let config = defaultConfig { exit = false }
+            path = "output/test.tmp.xml"
+        run' config [xunitReporter { indentation: 2, outputPath: path }] spec
         contents <- readTextFile UTF8 path
         unlink path
         pure contents
