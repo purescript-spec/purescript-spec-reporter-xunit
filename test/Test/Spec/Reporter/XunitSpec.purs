@@ -2,14 +2,12 @@ module Test.Spec.Reporter.XunitSpec where
 
 import Prelude
 
-import Effect.Class (liftEffect)
-import Node.Encoding (Encoding(UTF8))
-import Node.FS.Sync (readTextFile, unlink)
+import Data.XML.PrettyPrint as PP
 import Test.Spec (itOnly, Spec, it, describe)
 import Test.Spec.Assertions (fail)
 import Test.Spec.Assertions.String (shouldContain)
-import Test.Spec.Reporter.Xunit (xunitReporter)
-import Test.Spec.Runner (defaultConfig, run')
+import Test.Spec.Reporter.Xunit (encodeSuite)
+import Test.Spec.Runner (defaultConfig, runSpec')
 
 xunitSpec :: Spec Unit
 xunitSpec = do
@@ -17,7 +15,6 @@ xunitSpec = do
     describe "Spec" $
       describe "Reporter" $
         describe "Xunit" do
-          let doctype = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
           it "reports success" do
             contents <- runXunit successSpec
             contents `shouldContain` "<testcase name=\"works\"></testcase>"
@@ -31,10 +28,5 @@ xunitSpec = do
     failureSpec = describe "a" (itOnly "fails" (fail "OMG"))
 
     runXunit spec = do
-      liftEffect $ do
-        let config = defaultConfig { exit = false }
-            path = "output/test.tmp.xml"
-        run' config [xunitReporter { indentation: 2, outputPath: path }] spec
-        contents <- readTextFile UTF8 path
-        unlink path
-        pure contents
+      let config = defaultConfig { exit = false }
+      PP.print 2 <$> encodeSuite <$> runSpec' config spec

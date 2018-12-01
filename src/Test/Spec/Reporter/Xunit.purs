@@ -1,6 +1,7 @@
 module Test.Spec.Reporter.Xunit
        ( xunitReporter
        , defaultOptions
+       , encodeSuite
        ) where
 
 import Prelude
