@@ -15,12 +15,14 @@ module Main where
 
 import Prelude
 
-import Effect.Aff
-import Test.Spec.Runner
-import Test.Spec.Reporter.Xunit
+import Data.Identity (Identity(..))
+import Data.Newtype (un)
+import Test.Spec.Reporter.Xunit (defaultOptions, xunitReporter)
+import Test.Spec.Runner (defaultConfig, runSpecT)
 
-main = launchAff_ $ runSpec [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
-  ...
+main =
+  void $ un Identity $ runSpecT defaultConfig [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
+    ...
 ```
 
 ## Contribute
