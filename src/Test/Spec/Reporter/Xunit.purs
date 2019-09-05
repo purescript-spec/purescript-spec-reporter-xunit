@@ -4,35 +4,42 @@ module Test.Spec.Reporter.Xunit
        ) where
 
 import Prelude
+
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..))
 import Data.XML as XML
-import Test.Spec as S
-import Effect (Effect)
-import Effect.Exception (message)
 import Data.XML.PrettyPrint (print)
+import Effect (Effect)
+import Effect.Class (liftEffect)
+import Effect.Exception (message)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile, exists, unlink)
 import Node.Path (FilePath)
+import Pipes.Prelude (chain)
+import Test.Spec as S
+import Test.Spec.Result as R
 import Test.Spec.Runner (Reporter)
 import Test.Spec.Runner.Event as Event
-import Test.Spec.Reporter.Base (defaultReporter)
 
-encodeResult :: S.Result -> Array XML.Node
-encodeResult S.Success = []
-encodeResult (S.Failure err) =
+encodeResult :: R.Result -> Array XML.Node
+encodeResult (R.Success _speed _ms) = []
+encodeResult (R.Failure err) =
   [XML.Element
     "error"
     [XML.Attr "message" (message err)]
     [XML.Text (show err)]]
 
-encodeGroup :: S.Group S.Result -> XML.Node
-encodeGroup (S.Describe _ name groups) =
+encodeGroup :: S.Tree Void R.Result -> XML.Node
+encodeGroup (S.Node (Left name) groups) =
   XML.Element "testsuite" [XML.Attr "name" name] $ map encodeGroup groups
-encodeGroup (S.It _ name result) =
+encodeGroup (S.Node (Right action) groups) =
+  XML.Element "testsuite" [] $ map encodeGroup groups
+encodeGroup (S.Leaf name (Just result)) =
   XML.Element "testcase" [XML.Attr "name" name] (encodeResult result)
-encodeGroup (S.Pending name) =
+encodeGroup (S.Leaf name Nothing) =
   XML.Element "testcase" [XML.Attr "name" name] [XML.Element "skipped" [] []]
 
-encodeSuite :: Array (S.Group S.Result) -> XML.Document
+encodeSuite :: Array (S.Tree Void R.Result) -> XML.Document
 encodeSuite groups = XML.Document "1.0" "UTF-8" $ XML.Element "testsuite" [] $ map encodeGroup groups
 
 removeIfExists :: FilePath -> Effect Unit
@@ -48,13 +55,15 @@ defaultOptions :: XunitReporterOptions
 defaultOptions = { indentation: 2, outputPath: "output/test.xml" }
 
 
+-- | Outputs an XML file at a specified path that can be consumed by Xunit
+-- | readers, e.g. the Jenkins plugin.
 xunitReporter :: XunitReporterOptions -> Reporter
-xunitReporter options =
-  defaultReporter options update
+xunitReporter options = chain handleEvent
   where
-    update s = case _ of
-      Event.End results -> s <$ summarize results
-      _ -> pure s
+
+    handleEvent = case _ of
+      Event.End results -> void $ liftEffect $ summarize results
+      _                 -> pure unit
 
     summarize groups = do
       let xml = encodeSuite groups

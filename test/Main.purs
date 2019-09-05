@@ -4,12 +4,13 @@ import Prelude
 
 import Data.XML.PrettyPrintSpec (prettyPrintSpec)
 import Effect (Effect)
+import Effect.Aff (launchAff_)
 import Test.Spec.Reporter.Xunit (xunitReporter, defaultOptions)
 import Test.Spec.Reporter.XunitSpec (xunitSpec)
-import Test.Spec.Runner (run)
+import Test.Spec.Runner (runSpec)
 
 main :: Effect Unit
-main = run reporters do
+main = launchAff_ $ runSpec reporters do
   xunitSpec
   prettyPrintSpec
 

@@ -2,14 +2,15 @@ module Test.Spec.Reporter.XunitSpec where
 
 import Prelude
 
-import Effect.Class (liftEffect)
+import Data.Identity (Identity(..))
+import Data.Newtype (un)
 import Node.Encoding (Encoding(UTF8))
-import Node.FS.Sync (readTextFile, unlink)
-import Test.Spec (itOnly, Spec, it, describe)
+import Node.FS.Aff (readTextFile, unlink)
+import Test.Spec (Spec, it, describe)
 import Test.Spec.Assertions (fail)
 import Test.Spec.Assertions.String (shouldContain)
-import Test.Spec.Reporter.Xunit (xunitReporter)
-import Test.Spec.Runner (defaultConfig, run')
+import Test.Spec.Reporter.Xunit (defaultOptions, xunitReporter)
+import Test.Spec.Runner (defaultConfig, runSpecT)
 
 xunitSpec :: Spec Unit
 xunitSpec = do
@@ -27,14 +28,13 @@ xunitSpec = do
             contents `shouldContain` "Error"
 
   where
-    successSpec = describe "a" (itOnly "works" (pure unit))
-    failureSpec = describe "a" (itOnly "fails" (fail "OMG"))
+    successSpec = describe "a" (it "works" (pure unit))
+    failureSpec = describe "a" (it "fails" (fail "OMG"))
 
     runXunit spec = do
-      liftEffect $ do
-        let config = defaultConfig { exit = false }
-            path = "output/test.tmp.xml"
-        run' config [xunitReporter { indentation: 2, outputPath: path }] spec
-        contents <- readTextFile UTF8 path
-        unlink path
-        pure contents
+      let config = defaultConfig { exit = false }
+          path = "output/test.tmp.xml"
+      void $ un Identity $ runSpecT config [xunitReporter $ defaultOptions { outputPath = path }] spec
+      contents <- readTextFile UTF8 path
+      unlink path
+      pure contents
