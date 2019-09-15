@@ -10,7 +10,7 @@
     "output"
   ],
   "dependencies": {
-    "purescript-spec": "^4.0.0",
+    "purescript-spec": "^4.0.1",
     "purescript-node-fs-aff": "^6.0.0",
     "purescript-transformers": "^4.1.0"
   },

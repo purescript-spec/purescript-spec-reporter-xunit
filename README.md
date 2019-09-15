@@ -15,13 +15,11 @@ module Main where
 
 import Prelude
 
-import Data.Identity (Identity(..))
-import Data.Newtype (un)
 import Test.Spec.Reporter.Xunit (defaultOptions, xunitReporter)
-import Test.Spec.Runner (defaultConfig, runSpecT)
+import Test.Spec.Runner (defaultConfig, runSpec')
 
 main =
-  void $ un Identity $ runSpecT defaultConfig [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
+  runSpec' defaultConfig [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
     ...
 ```
 
