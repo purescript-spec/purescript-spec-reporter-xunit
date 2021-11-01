@@ -1,6 +1,6 @@
 {
   "name": "purescript-spec-reporter-xunit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "ignore": [
     "**/.*",
     "bower_components",
@@ -10,9 +10,9 @@
     "output"
   ],
   "dependencies": {
-    "purescript-spec": "^4.0.0",
-    "purescript-node-fs-aff": "^6.0.0",
-    "purescript-transformers": "^4.1.0"
+    "purescript-spec": "^5.0.1",
+    "purescript-node-fs-aff": "^7.0.0",
+    "purescript-transformers": "^5.2.0"
   },
   "license": "MIT",
   "repository": {
