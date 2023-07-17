@@ -29,17 +29,17 @@ encodeResult (R.Failure err) =
     [XML.Attr "message" (message err)]
     [XML.Text (show err)]]
 
-encodeGroup :: S.Tree Void R.Result -> XML.Node
+encodeGroup :: S.Tree String Void R.Result -> XML.Node
 encodeGroup (S.Node (Left name) groups) =
   XML.Element "testsuite" [XML.Attr "name" name] $ map encodeGroup groups
-encodeGroup (S.Node (Right action) groups) =
+encodeGroup (S.Node (Right _) groups) =
   XML.Element "testsuite" [] $ map encodeGroup groups
 encodeGroup (S.Leaf name (Just result)) =
   XML.Element "testcase" [XML.Attr "name" name] (encodeResult result)
 encodeGroup (S.Leaf name Nothing) =
   XML.Element "testcase" [XML.Attr "name" name] [XML.Element "skipped" [] []]
 
-encodeSuite :: Array (S.Tree Void R.Result) -> XML.Document
+encodeSuite :: Array (S.Tree String Void R.Result) -> XML.Document
 encodeSuite groups = XML.Document "1.0" "UTF-8" $ XML.Element "testsuite" [] $ map encodeGroup groups
 
 removeIfExists :: FilePath -> Effect Unit

@@ -1,0 +1,28 @@
+name: Build and test
+
+on:
+  push:
+    branches: master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: purescript-contrib/setup-purescript@main
+        with:
+          purescript: "unstable"
+          spago: "unstable"
+
+      - name: Cache PureScript dependencies
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-spago-${{ hashFiles('**/*.dhall') }}
+          path: |
+            .spago
+            output
+
+      - name: Build and test project
+        run: spago -x ./test.dhall test
