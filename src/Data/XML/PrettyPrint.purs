@@ -4,7 +4,7 @@ module Data.XML.PrettyPrint (
   ) where
 
 import Prelude
-import Data.XML as XML
+
 import Control.Monad.State (runStateT, get, lift, modify, StateT)
 import Control.Monad.Writer (execWriter, tell, Writer)
 import Data.Array (replicate)
@@ -13,7 +13,8 @@ import Data.Foldable (foldl, sequence_)
 import Data.String (Pattern(Pattern), split)
 import Data.String.CodeUnits (fromCharArray)
 import Data.String.Regex (regex, replace')
-import Data.String.Regex.Flags (RegexFlags(RegexFlags))
+import Data.String.Regex.Flags as Flags
+import Data.XML as XML
 
 type Indent = Int
 type CurrentIndent = Int
@@ -52,7 +53,7 @@ closeTag contents = enclosed "</" ">" contents
 
 escape :: String -> String
 escape s =
-  case regex "[<>\t\n\r\"]" flags of
+  case regex "[<>\t\n\r\"]" Flags.global of
     Left _ -> s
     Right exp -> replace' exp replacer s
   where replacer "<" _ = "&lt;"
@@ -61,13 +62,6 @@ escape s =
         replacer "\t" _ = ""
         replacer "\r" _ = ""
         replacer s' _ = s'
-        flags = RegexFlags {
-          unicode: false,
-          sticky: false,
-          multiline: false,
-          ignoreCase: false,
-          global: true
-        }
 
 printNode :: XML.Node -> Printer Unit
 printNode (XML.Comment s) = appendLine $ enclosed "<!-- " " -->" s
