@@ -19,7 +19,7 @@ import Test.Spec.Reporter.Xunit (xunitReporter)
 import Test.Spec.Runner (defaultConfig, runSpec)
 
 main =
-  runSpec defaultConfig [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
+  runSpec [ xunitReporter { indentation: 2, outputPath: "output/test.xml" } ] do
     ...
 ```
 
