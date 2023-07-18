@@ -1,22 +1,21 @@
 {
-  "name": "purescript-spec-reporter-xunit",
-  "version": "0.2.0",
-  "ignore": [
-    "**/.*",
-    "bower_components",
-    "tests",
-    "externs",
-    "tmp",
-    "output"
-  ],
-  "dependencies": {
-    "purescript-spec": "^7.5.1",
-    "purescript-node-fs-aff": "^9.2.0",
-    "purescript-transformers": "^6.0.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/purescript-spec/purescript-spec-reporter-xunit.git"
-  }
+    "name": "purescript-spec-reporter-xunit",
+    "license": [
+        "MIT"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/purescript-spec/purescript-spec-reporter-xunit.git"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-node-fs-aff": "^v9.2.0",
+        "purescript-spec": "^v7.5.0",
+        "purescript-transformers": "^v6.0.0"
+    }
 }
