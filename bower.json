@@ -14,7 +14,7 @@
         "output"
     ],
     "dependencies": {
-        "purescript-node-fs-aff": "^v9.2.0",
+        "purescript-node-fs": "^v9.1.0",
         "purescript-spec": "^v7.5.0",
         "purescript-transformers": "^v6.0.0"
     }
