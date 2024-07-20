@@ -11,18 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: purescript-contrib/setup-purescript@main
+      - uses: actions/setup-node@v4
         with:
-          purescript: "unstable"
-          spago: "unstable"
-
-      - name: Cache PureScript dependencies
-        uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-spago-${{ hashFiles('**/*.dhall') }}
-          path: |
-            .spago
-            output
+          node-version: "22.4"
 
       - name: Build and test project
-        run: spago -x ./test.dhall test
+        run: npx spago test

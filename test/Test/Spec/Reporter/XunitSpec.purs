@@ -16,7 +16,6 @@ xunitSpec = do
     describe "Spec" $
       describe "Reporter" $
         describe "Xunit" do
-          let doctype = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
           it "reports success" do
             contents <- runXunit successSpec
             contents `shouldContain` "<testcase name=\"works\"></testcase>"
